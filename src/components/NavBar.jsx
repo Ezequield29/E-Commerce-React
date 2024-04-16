@@ -31,7 +31,7 @@ function NavBar() {
             </li>
           </ul>
         </div>
-        <CartWidget /> {/* Agrega el componente CartWidget */}
+        <CartWidget /> 
       </div>
     </nav>
   );

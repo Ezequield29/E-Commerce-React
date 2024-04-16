@@ -47,7 +47,7 @@
 .cart-widget {
   display: flex;
   align-items: center;
-  margin-right: 20px; /* Espaciado entre el ícono y el número */
+  margin-right: 20px; 
 }
 
 .badge {
@@ -55,5 +55,5 @@
   color: rgb(155, 45, 45);
   border-radius: 50%;
   padding: 5px 10px;
-  margin-left: 5px; /* Espaciado entre el ícono y el número */
+  margin-left: 5px; 
 }
