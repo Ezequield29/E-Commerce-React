@@ -8,13 +8,15 @@ function App() {
   return (
     <div className='App'>
       <BrowserRouter>
-      <NavBar />
-      <Routes>
-        <Route path='/' element= {<ItemListContainer />} />
-        <Route path='/category/:categoryId' element= {<ItemListContainer />} />
-        <Route path='/item/:itemid' element= {<ItemDetailContainer />} />
-        <Route path='*' element= {<h1>404 NOT FOUND</h1>} />
-      </Routes>
+          <NavBar />
+           <div className='container-fluid'>
+           <Routes>
+              <Route path='/' element= {<ItemListContainer />} />
+              <Route path='/category/:categoryId' element= {<ItemListContainer />} />
+              <Route path='/item/:itemid' element= {<ItemDetailContainer />} />
+              <Route path='*' element= {<h1 className="text-center mt-5">404 NOT FOUND</h1>} />
+            </Routes>
+           </div>
       </BrowserRouter>
     </div>
   );

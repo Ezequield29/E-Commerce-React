@@ -1,4 +1,5 @@
 import { NavLink, Link } from 'react-router-dom';
+import '../../src/Styles.css';
 const ItemDetail = ({id, title, thumbnail, price, stock}) => {
     return (
         <article className="CardItem">

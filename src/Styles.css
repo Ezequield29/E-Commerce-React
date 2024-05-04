@@ -2,4 +2,21 @@
 .badge {
     color: black;
   }
+  .ItemImg {
+    width: 100%; /* Esto hará que la imagen ocupe todo el ancho disponible */
+    max-width: 8cm; /* Esto establecerá un máximo de 8cm para el ancho de la imagen */
+    height: auto; /* Esto permitirá que la altura se ajuste automáticamente para mantener la proporción de la imagen */
+  }
+  .product-list {
+    display: flex; /* Mostrar los elementos en línea */
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan a la siguiente línea si no hay suficiente espacio */
+    justify-content: space-around; /* Distribuir los elementos de manera uniforme a lo largo del contenedor con espacio alrededor */
+  }
+  .Option {
+    margin-right: 10px; /* Agrega un margen a la derecha de cada enlace */
+  }
   
+  /* Opcionalmente, puedes agregar un margen izquierdo al primer enlace para separarlo del título */
+  .Option:first-child {
+    margin-left: 10px;
+  }
