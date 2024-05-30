@@ -1,6 +1,19 @@
 import { NavLink, Link } from 'react-router-dom';
 import '../../src/Styles.css';
+import { useContext, useState } from 'react';
+import { CartContext } from './CartContext';
 const ItemDetail = ({id, title, thumbnail, price, stock}) => {
+    const [quantityAdded, setQuantityAdded] = useState(0)
+
+    const {addItem} = useContext(CartContext)
+
+    const handleOnAdd = (quantity)=>{
+        setQuantityAdded(quantity)
+        const item = {
+            id, name, price
+        }
+        addItem(item, quantity)
+    }
     return (
         <article className="CardItem">
             <header className="Header">
@@ -20,7 +33,14 @@ const ItemDetail = ({id, title, thumbnail, price, stock}) => {
                 </p>
             </section>
             <footer className="ItemFooter">
-                <Link to={`/item/${id}`} className="Option">Ver detalle</Link>
+                {
+                    quantityAdded > 0 ?(
+                        <Link to='/cart' className="Option">Terminar Compra</Link>
+                    ) : (
+                        <itemCount initial={1} stock={stock} onAdd={handleOnAdd}/>
+                    )
+                }
+            
             </footer>
         </article>
     )
