@@ -51,3 +51,4 @@ export const getProductsByCategory = (categoryId) => {
         },500)
     })
 }
+export default products

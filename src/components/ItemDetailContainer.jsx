@@ -1,38 +1,33 @@
 import { useState,useEffect } from "react";;
 import ItemDetail from "./itemDetail";
 import { useParams } from "react-router-dom";
-import { getDoc, doc } from "firebase/firestore"
-import { db } from "./services/firebase/firebaseConfig";
-
+import { getDoc, doc, getFirestore } from "firebase/firestore"
+import Loading from "./Loading";
 
 
 const ItemDetailContainer = () => {
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true)
+    const [item, setItem] = useState({}); //este se cambio en usestate([])
+    const {id} = useParams()
+    const [loading, setLoading] = useState(true);
 
-    const {itemId} = useParams()
+/* esto es mio   */  useEffect(()=>{
+    console.log(id)
+        const db = getFirestore();
+        const docRef = doc(db, "items", id);
+        getDoc(docRef).then(snapShot => {
+            if (snapShot.exists()) {
+                setItem({id: snapShot.id, ...snapShot.data()});
+                setLoading(false);
+        }
+    })
+}, [id]);
 
-    useEffect(()=>{
-        setLoading(true)
 
-        const docRef = doc(db, 'products', itemId)
-
-        getDoc(docRef)
-            .then(response => {
-                const data=response.data()
-                const productsAdapted= {id: response.id, ...data}
-                setProduct(productsAdapted)
-            })
-        .catch(error=>{
-            console.log(error)
-        })
-        .finally(()=>{
-            setLoading(false)
-            })
-    },[itemId])
     return(
-        <div className="ItemDetailContainer">
-            <ItemDetail {...product} />
+        <div className="container">
+            <div className="row my-5">
+                {loading ? <Loading/> : <ItemDetail item={item} />}
+            </div>
         </div>
     )
 }

@@ -1,48 +1,31 @@
-import { NavLink, Link } from 'react-router-dom';
 import '../../src/Styles.css';
-import { useContext, useState } from 'react';
+import ItemCount from './itemCount';
+import { useContext} from 'react';
 import { CartContext } from './CartContext';
-const ItemDetail = ({id, title, thumbnail, price, stock}) => {
-    const [quantityAdded, setQuantityAdded] = useState(0)
-
+const ItemDetail = ({item}) => {
     const {addItem} = useContext(CartContext)
-
-    const handleOnAdd = (quantity)=>{
-        setQuantityAdded(quantity)
-        const item = {
-            id, name, price
-        }
+    const onAdd = (quantity) =>{
         addItem(item, quantity)
+    console.log("Agregaste: " + quantity+ "productos!")
+    }
+    console.log("Item:", item);
+    if (!item.id) {
+        return <p>Cargando...</p>;
     }
     return (
-        <article className="CardItem">
-            <header className="Header">
-                <h2 className="ItemHeader">
-                    {title}
-                </h2>
-            </header>
-            <picture>
-                <img src={thumbnail} alt={title} className="ItemImg"/>
-            </picture>
-            <section>
-                <p className="Info">
-                    precio: $ {price}
-                </p>
-                <p className="Info">
-                    stock Disponible: {stock}
-                </p>
-            </section>
-            <footer className="ItemFooter">
-                {
-                    quantityAdded > 0 ?(
-                        <Link to='/cart' className="Option">Terminar Compra</Link>
-                    ) : (
-                        <itemCount initial={1} stock={stock} onAdd={handleOnAdd}/>
-                    )
-                }
-            
-            </footer>
-        </article>
+        <div className='container'>
+            <div className='row'>
+                <div className='col-md-4 offset-md-2'>
+                    <img src={item.thumbnail} className='img-fluid' alt={item.title} />
+                </div>
+                <div className='col-md-4'>
+                    <h1 className='fs-3 text-uppercase fw-semibold'>{item.title}</h1>
+                    <p className='fs-4 fw-bold'>${item.price}</p>
+                    <p className='small'>{item.description} </p>
+                    <ItemCount stock={item.stock} onAdd={onAdd} />
+                </div>
+            </div>
+        </div>
     )
-}
+} 
 export default ItemDetail

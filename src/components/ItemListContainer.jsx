@@ -1,49 +1,88 @@
-// ItemListContainer.jsx
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { getDocs, collection, query, where } from "firebase/firestore";
-import { db } from "./services/firebase/firebaseConfig";
-import ProductList from "./ProductList";
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
+import ItemList from "./ItemList";
+import Loading from "./Loading";
 
 const ItemListContainer = ({ greeting }) => {
-  const [products, setProducts] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { categoryId } = useParams();
+  const { id } = useParams();
 
-  useEffect(() => {
-    setLoading(true);
-    const collectionRef = categoryId
-      ? query(collection(db, "products"), where("category", "==", categoryId))
-      : collection(db, "products");
+//Acceder a una coleccion mediante una Query echo con profe
+useEffect(()=>{
+  console.log(id);
 
-    getDocs(collectionRef)
-      .then((response) => {
-        const productsAdapted = response.docs.map(doc => {
-          const data = doc.data();
-          return { id: doc.id, ...data };
-        });
-        setProducts(productsAdapted);
-      })
-      .catch(error => {
-        console.log(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [categoryId]);
+  const db = getFirestore();
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const itemsCollection = collection(db, "items");
+  const queryCollection= id ? query(itemsCollection,where("category", "==", id)) : itemsCollection;
+
+  getDocs (queryCollection).then(snapShot =>{
+    if (snapShot.size > 0){
+      setItems(snapShot.docs.map(item =>({id:item.id, ...item.data()})));
+      setLoading(false)
+    }
+  })
+},[id]);
+
 
   return (
     <div className="container">
+      <div className="row my-5">
       <h2>{greeting}</h2>
       <p>Bienvenido a nuestra tienda de productos de computación.</p>
-      <ProductList products={products} />
+      {loading ? <Loading/> : <ItemList items={items} />}
+      </div>
     </div>
   );
 };
 
 export default ItemListContainer;
+
+//con Chat GPT
+/* import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
+import ItemList from "./ItemList";
+import Loading from "./Loading";
+
+const ItemListContainer = ({ greeting }) => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+
+  useEffect(() => {
+    console.log('Category ID:', id);  // Verificar el id
+
+    const db = getFirestore();
+    const itemsCollection = collection(db, "items");
+    const queryCollection = id ? query(itemsCollection, where("category", "==", id)) : itemsCollection;
+
+    getDocs(queryCollection).then(snapShot => {
+      if (snapShot.size > 0) {
+        setItems(snapShot.docs.map(item => ({ id: item.id, ...item.data() })));
+      } else {
+        console.log("No items found in this category.");
+      }
+      setLoading(false);
+    }).catch(error => {
+      console.error("Error fetching items:", error);
+      setLoading(false);
+    });
+  }, [id]);
+
+  return (
+    <div className="container">
+      <div className="row my-5">
+        <h2>{greeting}</h2>
+        <p>Bienvenido a nuestra tienda de productos de computación.</p>
+        {loading ? <Loading /> : <ItemList items={items} />}
+      </div>
+    </div>
+  );
+};
+
+export default ItemListContainer; */

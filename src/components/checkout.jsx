@@ -1,74 +1,103 @@
 import { useContext, useState } from "react";
-import { CartContext } from "./CartContext";
-import { documentId, where } from "firebase/firestore";
-import { db } from "./services/firebase/firebaseConfig";
-
-import CheckoutForm from "./CheckoutForm";
+import CartContext from "./CartContext";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
+import { Link } from "react-router-dom";
 
 const Checkout = ()=>{
-    const [loading, setLoading] = useState(false)
-    const [orderId, setOrderId] = useState('')
+    const {cart,clearCart, getCountProducts, getSumProducts} = useContext(CartContext)
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [orderId, setOrderId] = useState("");
 
-const {cart, total, clearCart} = useContext(CartContext)
-
-const createOrder = async ({name,phone,email})=> {
-    setLoading(true)
-
-    try{
-        const objOrder={
-            buyer: {
-                name,phone,email
-            },
-            items: cart,
-            total: total,
-            date: Timestamp.fromDate(new Date())
+       const generarOrden = () => {
+        if (name == ""){
+            return false;
         }
-        const batch = writeBatch(db)
-        const outOfStock=[]
-        const ids = cart.map(prod => prod.id)
-        const productsRef = colletcion(db,'products')
-        const productsSnapshot = await getDocs(query(productsRef, where (documentId(), 'in', ids)))
-   
-
-        const {docs} = productsAddedFromFirestore
-
-        docs.forEach(doc=>{
-            const dataDoc = doc.data()
-            const stockDb = dataDoc.stock
-            const productsAdaptedToCart = cart.find(prod => prod.id === doc.id)
-            const prodQuantity = productsAdaptedToCart?.quantity
-            if(stockDb>= prodQuantity){
-                batch.update(doc.ref, {stock: stockDb - prodQuantity})
-            }else{
-                outOfStock.push({id: doc.id, ...dataDoc})
-            }
-        })
-        if(outOfStock.length === 0){
-            await batch.commit()
-            const orderRef= collection(db,'orders')
-            const orderAdded = await addDoc(orderRef,objOrder)
-            setOrderId(orderAdded.id)
-            clearCart()
-    }else{
-        console.log('hay productos que estan fuera de stock')
+        if (email == ""){
+            return false;
+        }
+        if (phone == ""){
+            return false;
+        }
+            const buyer = {name:name, email:email, phone:phone}
+            const items = cart.map (item => ({id:item.id, title:item.title, price:item.price}))
+            const date = new Date();
+            const currentDate = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()} 
+            ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+            const order = {buyer:buyer, items:items, date:currentDate, total:getSumProducts()}
+            /* console.log(order) */
+            //Agrego un nuevo Documento a la coleccion Orders
+            const db = getFirestore()
+            const ordersCollection = collection(db, "orders")
+            addDoc(ordersCollection, order).then(data =>{
+                setOrderId(data.id);
+                setName("");
+                setEmail("");
+                setPhone("");
+                clearCart();
+            });
+        }
+    if(getCountProducts()==0 && !orderId){
+        return(
+            <div className="container my-5">
+                <div className="row">
+                    <div className="col text-center">
+                        <h3>No se encontraron productos en el Carrito!</h3>
+                        <Link to={"/"} className="btn text-white bg-dark rounded-0 my-5" >Volver a la Pagina 
+                        Principal</Link>
+                    </div>
+                </div>
+            </div>
+        )
     }
-}catch(error){
-    console.log(error)
-}finally{
-    setLoading(false)
-}
-}
-if(loading){
-    return <h1>Se esta generando su orden...</h1>
-}
-if(orderId){
-    return <h1>El id de su orden es:{orderId} </h1>
-}
 return(
-    <div>
-        <h1>Checkout</h1>
-        <CheckoutForm onConfirm={createOrder} />
+    <div className="container my-5">
+       {!orderId ?
+        <div className="row">
+            <div className="col">
+                <form >
+                    <div className="mb-3">
+                        <label className="form-label">Nombre:</label>
+                        <input type="text" className="form-control" onInput={(e) => {setName(e.target.value)}}/>
+                    </div>
+                    <div>
+                    <label className="form-label">Email:</label>
+                        <input type="text" className="form-control" onInput={(e) => {setEmail(e.target.value)}}/>
+                    </div>
+                    <div>
+                    <label className="form-label">Telefono:</label>
+                        <input type="text" className="form-control" onInput={(e) => {setPhone(e.target.value)}}/>
+                    </div>
+                    <button type="button" className="btn text-white bg-black" onClick={generarOrden}> Generar Orden</button>
+                </form>
+            </div>
+            <div className="col">
+                <table className="table">
+                    <tbody>
+                        {cart.map(item=>(
+                            <tr key={item.id}>
+                                <td> <img src={item.thumbnail} alt={item.title} width={80} /></td>
+                                <td> {item.title} </td>
+                                <td>X{item.quantity} </td>
+                                <td className="text-end"> ${item.price} </td>
+                            </tr>
+                        ))}
+                        <tr>
+                            <td colSpan={3}><b>Total</b></td>
+                            <td className="text-end"><b>${getSumProducts()}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        : ""}
+        <div className="row">
+            <div className="col">
+                {orderId ?<div className="alert alert-light" role="alert"> "Felicitaciones! Tu ID de Compra es: <b> {orderId }</b></div>: ""}
+            </div>
+        </div>
     </div>
- )
+)
 }
 export default Checkout
