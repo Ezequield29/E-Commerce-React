@@ -8,25 +8,29 @@ import Loading from "./Loading";
 const ItemListContainer = ({ greeting }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams();
+  const { categoryId} = useParams();
 
-//Acceder a una coleccion mediante una Query echo con profe
 useEffect(()=>{
-  console.log(id);
 
   const db = getFirestore();
 
   const itemsCollection = collection(db, "items");
-  const queryCollection= id ? query(itemsCollection,where("category", "==", id)) : itemsCollection;
+  const queryCollection= categoryId ? query(itemsCollection,where("category", "==", categoryId)) : itemsCollection;
 
-  getDocs (queryCollection).then(snapShot =>{
-    if (snapShot.size > 0){
-      setItems(snapShot.docs.map(item =>({id:item.id, ...item.data()})));
-      setLoading(false)
+  getDocs (queryCollection)
+    .then(snapShot =>{
+      if (snapShot.size > 0){
+        setItems(snapShot.docs.map(item => ({ id: item.id, ...item.data() })));
+    } else {
+      setItems ([]);
     }
+    setLoading(false);
   })
-},[id]);
-
+  .catch(error => {
+    console.error("Error al cargar los productos:", error);
+    setLoading(false);
+  });
+},[categoryId]);
 
   return (
     <div className="container">
