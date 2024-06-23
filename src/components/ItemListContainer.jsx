@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
-import ItemList from "./ItemList";
+import ItemList from "./ItemList"
 import Loading from "./Loading";
 
 const ItemListContainer = ({ greeting }) => {
