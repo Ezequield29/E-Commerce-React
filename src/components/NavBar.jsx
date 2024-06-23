@@ -8,7 +8,7 @@ const NavBar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-black">
       <Link to='/'>
-      <h3 className="navbar-brand text-white">Mi Tienda</h3>
+      <h3 className="navbar-brand text-white">COMPUTEK</h3>
       </Link>
 
       <div className="collapse navbar-collapse d-flex justify-content-center">
